@@ -1,0 +1,20 @@
+apiVersion: {{ .Values.services.version }}
+kind: Service
+metadata:
+  name: {{ .Values.services.maingame.name }}
+  labels:
+    app: {{ .Values.services.maingame.name }}
+spec:
+  # comment or delete the following line if you want to use a LoadBalancer
+  type: {{ .Values.services.maingame.type }} 
+  # if your cluster supports it, uncomment the following to automatically create
+  # an external load-balanced IP for the frontend service.
+  # type: LoadBalancer
+  ports:
+  - port: 80
+    {{- if eq .Values.services.maingame.type "NodePort" }}
+    nodePort: 30000
+    {{- end }}
+    name: http
+  selector:
+    app: {{ .Values.services.maingame.selector }}

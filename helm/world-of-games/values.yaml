@@ -1,0 +1,70 @@
+services:
+  version: v1
+  db:
+    name: wogdb
+    type: ClusterIP
+    selector: wogdb
+    port: 3306
+  maingame:
+    name: wog-maingame-svc
+    type: NodePort
+    selector: maingame
+  guessgame:
+    name: wog-guessgame-svc
+    type: NodePort
+    selector: guessgame
+  memorygame:
+    name: wog-memorygame-svc
+    type: NodePort
+    selector: memorygame
+  currecyrollete:
+    name: wog-currecyrollete-svc
+    type: NodePort
+    selector: currecyrollete
+  scores:
+    name: wog-scores-svc
+    type: NodePort
+    selector: scores
+
+deployments:
+  version: apps/v1
+  db:
+    name: wogdb
+    replicaCount: 1
+    image: mysql:5.7
+    cpu: 100m
+    memory: 1024Mi
+  currecyrollete:
+    name: wog-currecyrollete
+    replicaCount: 1
+    image: evyatare92/wog_currecyrollete
+    cpu: 100m
+    memory: 256Mi
+  guessgame:
+    name: wog-guessgame
+    replicaCount: 1
+    image: evyatare92/wog_guessgame
+    cpu: 100m
+    memory: 256Mi
+  maingame:
+    name: wog-maingame
+    replicaCount: 1
+    image: evyatare92/wog_maingame
+    cpu: 100m
+    memory: 256Mi
+  memorygame:
+    name: wog-memorygame
+    replicaCount: 1
+    image: evyatare92/wog_memorygame
+    cpu: 100m
+    memory: 256Mi
+  scores:
+    name: wog-scores
+    replicaCount: 1
+    image: evyatare92/wog_scores
+    cpu: 100m
+    memory: 256Mi
+
+dbPassword: worldofgames
+dbSize: 5Gi
+dbInitScriptLocation: /c/Users/DB

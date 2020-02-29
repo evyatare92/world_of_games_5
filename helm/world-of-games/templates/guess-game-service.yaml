@@ -1,0 +1,20 @@
+apiVersion: {{ .Values.services.version }}
+kind: Service
+metadata:
+  name: {{ .Values.services.guessgame.name }}
+  labels:
+    app: {{ .Values.services.guessgame.name }}
+spec:
+  # comment or delete the following line if you want to use a LoadBalancer
+  type: {{ .Values.services.guessgame.type }} 
+  # if your cluster supports it, uncomment the following to automatically create
+  # an external load-balanced IP for the frontend service.
+  # type: LoadBalancer
+  ports:
+  - port: 80
+    {{- if eq .Values.services.guessgame.type "NodePort" }}
+    nodePort: 30002
+    {{- end }}
+    name: http
+  selector:
+    app: {{ .Values.services.guessgame.selector }}

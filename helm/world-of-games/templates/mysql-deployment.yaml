@@ -1,0 +1,58 @@
+apiVersion: {{ .Values.deployments.version }}
+kind: Deployment
+metadata:
+  name: {{ .Values.deployments.db.name }}
+  labels:
+    app: {{ .Values.deployments.db.name }}
+    role: db
+    tier: backend
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.deployments.db.name }}
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.deployments.db.name }}
+        role: db
+        tier: backend
+    spec:
+      containers:
+          - name: {{ .Values.deployments.db.name }}
+            image: {{ .Values.deployments.db.image }}
+            resources:
+              requests:
+                cpu: {{ .Values.deployments.db.cpu }}
+                memory: {{ .Values.deployments.db.memory }}
+            ports:
+            - containerPort: 3306
+            env:
+            - name: GET_HOSTS_FROM
+              value: dns
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom: 
+                secretKeyRef:
+                    name: db-secret
+                    key: password
+            - name: MYSQL_DATABASE
+              value: games
+            - name: MYSQL_USER
+              value: worldofgames
+            - name: MYSQL_PASSWORD
+              valueFrom: 
+                secretKeyRef:
+                    name: db-secret
+                    key: password
+            volumeMounts:
+            - name: db-script-vol
+              mountPath: /docker-entrypoint-initdb.d
+            - name: wog-persistent-storage
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: db-script-vol
+          hostPath:
+              path: {{ .Values.dbInitScriptLocation }}
+        - name: wog-persistent-storage
+          persistentVolumeClaim:
+            claimName: wogdb-pv-claim

@@ -1,0 +1,52 @@
+apiVersion: {{ .Values.deployments.version }} # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ .Values.deployments.scores.name }}
+  labels:
+    app: {{ .Values.services.scores.selector }}
+spec:
+  selector:
+    matchLabels:
+      app: scores
+      tier: frontend
+  replicas: {{ .Values.deployments.scores.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.services.scores.selector }}
+        tier: frontend
+    spec:
+      containers:
+      - name: {{ .Values.deployments.scores.name }}
+        image: {{ .Values.deployments.scores.image }}
+        resources:
+          requests:
+            cpu: {{ .Values.deployments.scores.cpu }}
+            memory: {{ .Values.deployments.scores.memory }}
+        env:
+        - name: GET_HOSTS_FROM
+          value: dns
+        - name: MYSQL_DB_SERVER
+          value: {{ .Values.services.db.name }}
+        - name: MYSQL_DB_PORT
+          value: "{{ .Values.services.db.port }}"
+        - name: MYSQL_DB_NAME
+          value: games
+        - name: MYSQL_DB_USERNAME
+          value: worldofgames
+        - name: MYSQL_DB_PASSWORD
+          valueFrom: 
+            secretKeyRef:
+                name: db-secret
+                key: password
+          # Using `GET_HOSTS_FROM=dns` requires your cluster to
+          # provide a dns service. As of Kubernetes 1.3, DNS is a built-in
+          # service launched automatically. However, if the cluster you are using
+          # does not have a built-in DNS service, you can instead
+          # access an environment variable to find the master
+          # service's host. To do so, comment out the 'value: dns' line above, and
+          # uncomment the line below:
+          # value: env
+        ports:
+        - containerPort: 80
+

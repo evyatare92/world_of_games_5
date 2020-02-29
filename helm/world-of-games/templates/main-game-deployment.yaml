@@ -1,0 +1,31 @@
+apiVersion: {{ .Values.deployments.version }} # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ .Values.deployments.maingame.name }}
+  labels:
+    app: {{ .Values.services.maingame.selector }}
+spec:
+  selector:
+    matchLabels:
+      app: maingame
+      tier: frontend
+  replicas: {{ .Values.deployments.maingame.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.services.maingame.selector }}
+        tier: frontend
+    spec:
+      containers:
+      - name: {{ .Values.deployments.maingame.name }}
+        image: {{ .Values.deployments.maingame.image }}
+        resources:
+          requests:
+            cpu: {{ .Values.deployments.maingame.cpu }}
+            memory: {{ .Values.deployments.maingame.memory }}
+        env:
+        - name: GET_HOSTS_FROM
+          value: dns
+        ports:
+        - containerPort: 80
+
